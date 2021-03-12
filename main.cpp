@@ -5,7 +5,10 @@
 #include <chrono>
 #include <random>
 #include <vector>
-#include "Banner.h"
+
+bool test1();
+
+bool test2();
 
 std::mt19937& rng()
 {
@@ -20,6 +23,8 @@ int random(int min, int max)
     return d(rng());
 }
 
+int find_surface(std::vector<int>& buildings);
+
 int main()
 {
     std::vector<int> list_of_buildings; // tablica H 
@@ -30,40 +35,45 @@ int main()
     {
         int height = random(1, 10000); // ka¿dy element tablicy jest liczb¹ ca³kowit¹ z zakresu [1..10 000].
         list_of_buildings.push_back(height);
-
     }
 
+    std::cout<< " Minimum surface needed to cover the buildings: " << find_surface(list_of_buildings) << std::endl;
+
+    if (test1())
+        std::cout << "Test 1: Success! " << std::endl;
+    else
+        std::cout << "Test 1: Failure " << std::endl;
+
+    if (test2())
+        std::cout << "Test 2: Success! " << std::endl;
+    else
+        std::cout << "Test 2: Failure " << std::endl;
 
     return 0;
 }
 
-int Banner::find_surface(std::vector<int>& buildings)
+int find_surface(std::vector<int>& buildings)
 {
 
     int total_width = buildings.size();
-    auto it = max_element(std::begin(buildings), std::end(buildings));
-    int total_maximum_height = *it;
+    int total_maximum_height = *max_element(buildings.begin(), buildings.end());
+
     int one_banner_surface = total_width * total_maximum_height;
+
     int minimum_surface = one_banner_surface;
 
-    for (std::vector<int>::iterator i1 = buildings.begin(); i1 != buildings.end(); i1++) // begin + 1 (szerokosc to minum 1)
+    for (std::vector<int>::iterator i1 = buildings.begin()+1; i1 != buildings.end(); i1++) // begin + 1 (szerokosc to minum 1)
     {
-        auto point_of_division_index = std::distance(buildings.begin(), it);
+        int point_of_division_index = std::distance(buildings.begin(), i1);
 
-        int height_of_the_first_banner = 0;
+        int height_of_the_first_banner = *max_element(buildings.begin(), buildings.begin()+ point_of_division_index);
 
-        height_of_the_first_banner = *max_element(buildings.begin(), buildings.begin()+ point_of_division_index);
-
-        int surface_of_the_first_banner = height_of_the_first_banner *point_of_division_index;
+        int surface_of_the_first_banner = height_of_the_first_banner * point_of_division_index;
 
         int height_of_the_second_banner = 0;
             
         if (height_of_the_first_banner == total_maximum_height)
-            {
-                //auto it2 = max_element(buildings.begin() + point_of_division_index, buildings.end());
-                //height_of_the_second_banner = *it2;
                 height_of_the_second_banner = *max_element(buildings.begin() + point_of_division_index, buildings.end());
-            }
          else
                 height_of_the_second_banner = total_maximum_height;
 
@@ -71,10 +81,47 @@ int Banner::find_surface(std::vector<int>& buildings)
          
          int surface_of_two_banners = surface_of_the_first_banner + surface_of_the_second_banner;
          
-         if (one_banner_surface > surface_of_two_banners)
+         if (minimum_surface > surface_of_two_banners)
              minimum_surface = surface_of_two_banners;
-
     }
 
     return minimum_surface;
+}
+
+bool test1()
+{
+    std::vector<int> buildings;
+    buildings.push_back(3);
+    buildings.push_back(1);
+    buildings.push_back(4);
+
+    const int expected_result = 10;
+
+    int result = find_surface(buildings);
+
+    if (result == expected_result)
+        return true;
+
+    return false;
+}
+
+
+bool test2()
+{
+    std::vector<int> buildings;
+    buildings.push_back(5);
+    buildings.push_back(3);
+    buildings.push_back(5);
+    buildings.push_back(2);
+    buildings.push_back(1);
+
+    const int expected_result = 19;
+
+    int result = find_surface(buildings);
+
+    if (result == expected_result)
+        return true;
+
+    return false;
+
 }
